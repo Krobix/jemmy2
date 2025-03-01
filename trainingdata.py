@@ -13,6 +13,8 @@ evals = ""
 
 convo_amount_res = {}
 
+convos = []
+
 def convo_to_str(cname, convo):
     val = ("")
     val+=f"<|channel {cname}|>"
@@ -30,31 +32,35 @@ for fn in os.listdir(data_folder):
         data = json.load(f)
         messages = data["messages"]
         cname = data["channel"]["name"]
-        convos = []
-        while (len(convos) < conversations+eval_convos_amount) and len(messages)>0:
+        chconvos = []
+        while (len(chconvos) < conversations+eval_convos_amount) and len(messages)>0:
             clen = random.randrange(*conversation_msg_range)
             convo_amount_res[fn]+=1
             if clen>len(messages):
                 break
             print(f"Conversation length: {clen}")
-            c=[]
+            c=[cname]
             for i in range(clen):
                 msg = messages.pop(0)
                 c.append(msg)
-            convos.append(c)
-        if len(convos)<conversations+eval_convos_amount:
-            eval_convos_amount = int(len(convos)*0.1)
-        newc=[]
-        print("Randomizing convo order")
-        while len(convos)>0:
-            newc.append(convos.pop(random.randrange(0, len(convos))))
-        convos = newc
-        for c in convos[:len(convos)-eval_convos_amount]:
-            cs=convo_to_str(cname, c)
-            trainings+=cs
-        for c in convos[len(convos) - eval_convos_amount:]:
-            cs=convo_to_str(cname,c)
-            evals+=cs
+            chconvos.append(c)
+        for chc in chconvos:
+            convos.append(chc)
+
+newc=[]
+print(f"Randomizing convo order; {len(convos)} convos total")
+while len(convos)>0:
+    newc.append(convos.pop(random.randrange(0, len(convos))))
+convos = newc
+eval_convos_amount = int(len(convos)*0.1)
+for c in convos[:len(convos)-eval_convos_amount]:
+    cname = c.pop(0)
+    cs=convo_to_str(cname, c)
+    trainings+=cs
+for c in convos[len(convos) - eval_convos_amount:]:
+    cname = c.pop(0)
+    cs=convo_to_str(cname,c)
+    evals+=cs
 
 with open(training_file, "w") as f:
     f.write(trainings)
