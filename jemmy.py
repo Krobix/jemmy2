@@ -73,7 +73,7 @@ class Jemmy(discord.Client):
                 prompt = create_prompt(messages)
                 out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["<|endmessage"])
                 pl = len(prompt)
-                outs = out["choices"][0]["text"][pl:]
+                outs = out["choices"][0]
                 await msg.reply(outs)
 
 intents = discord.Intents.default()
