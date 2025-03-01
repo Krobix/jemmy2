@@ -63,7 +63,8 @@ class Jemmy(discord.Client):
                 messages = [msg]
                 if is_reply:
                     while messages[0].reference is not None:
-                        messages.insert(0, messages[0].reference)
+                        nm = await msg.channel.fetch_message(messages[0].reference.message_id)
+                        messages.insert(0, nm)
                 else:
                     messages = []
                     async for m in msg.channel.history:
