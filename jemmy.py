@@ -23,7 +23,7 @@ def getcn(msg):
     else:
          return random.choice(replace_channel_names)
 
-def create_prompt(messages, max_len=2048):
+def create_prompt(messages, max_len=1024):
     tokenl = []
     strs = []
     cstr = f"<|channel {getcn(messages[0])}|>"
