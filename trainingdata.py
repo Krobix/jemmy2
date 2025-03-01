@@ -47,7 +47,7 @@ for fn in os.listdir(data_folder):
         newc=[]
         print("Randomizing convo order")
         while len(convos)>0:
-            newc.append(convos.pop(random.randint(0, len(convos))))
+            newc.append(convos.pop(random.randrange(0, len(convos))))
         convos = newc
         for c in convos[:len(convos)-eval_convos_amount]:
             cs=convo_to_str(cname, c)
