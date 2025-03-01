@@ -28,7 +28,7 @@ def create_prompt(messages, max_len=1024):
     strs = []
     cstr = f"<|channel {getcn(messages[0])}|>"
     for m in messages:
-        s = f"<|message {m.author.name}|>{m.content}<|endmessage|>"
+        s = f"<|message {m.author.name}|>{m.content}</s>"
         strs.append(s)
         tokenl.append(llm.tokenize(s.encode("utf-8")))
     while True:
@@ -71,7 +71,7 @@ class Jemmy(discord.Client):
                         messages.append(m)
                     messages.append(msg)
                 prompt = create_prompt(messages)
-                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["<|endmessage"])
+                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["</s>"])
                 pl = len(prompt)
                 outs = out["choices"][0]["text"]
                 await msg.reply(outs)

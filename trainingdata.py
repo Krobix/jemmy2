@@ -17,7 +17,7 @@ def convo_to_str(cname, convo):
     val = ("")
     val+=f"<|channel {cname}|>"
     for msg in convo:
-        val+=f"<|message {msg["author"]["name"]}|>{msg["content"]}<|endmessage|>"
+        val+=f"<|message {msg["author"]["name"]}|>{msg["content"]}</s>"
     val+="<|endoftext|>\n"
     return val
 
