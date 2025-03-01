@@ -11,6 +11,8 @@ eval_file = "eval_data.txt"
 trainings = ""
 evals = ""
 
+convo_amount_res = {}
+
 def convo_to_str(cname, convo):
     val = ("")
     val+=f"<|channel {cname}|>"
@@ -23,6 +25,7 @@ def convo_to_str(cname, convo):
 for fn in os.listdir(data_folder):
     with open(data_folder+fn, "r") as f:
         eval_convos_amount = int(conversations * 0.1)
+        convo_amount_res[fn]=0
         print(f"Reading {fn}...")
         data = json.load(f)
         messages = data["messages"]
@@ -30,6 +33,7 @@ for fn in os.listdir(data_folder):
         convos = []
         while (len(convos) < conversations+eval_convos_amount) and len(messages)>0:
             clen = random.randrange(*conversation_msg_range)
+            convo_amount_res[fn]+=1
             if clen>len(messages):
                 break
             print(f"Conversation length: {clen}")
@@ -40,6 +44,11 @@ for fn in os.listdir(data_folder):
             convos.append(c)
         if len(convos)<conversations+eval_convos_amount:
             eval_convos_amount = int(len(convos)*0.1)
+        newc=[]
+        print("Randomizing convo order")
+        while len(convos)>0:
+            newc.append(convos.pop(random.randint(0, len(convos))))
+        convos = newc
         for c in convos[:len(convos)-eval_convos_amount]:
             cs=convo_to_str(cname, c)
             trainings+=cs
@@ -52,3 +61,7 @@ with open(training_file, "w") as f:
 
 with open(eval_file, "w") as f:
     f.write(evals)
+
+print("Convos per channel:")
+for c in convo_amount_res:
+    print(f"{c}:\n{convo_amount_res[c]}")
