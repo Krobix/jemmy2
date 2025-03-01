@@ -3,9 +3,12 @@ import discord
 import os, random
 
 MODEL_PATH = f"{os.getenv('HOME')}/jemmy_v1.gguf"
-llm = Llama(MODEL_PATH, n_ctw=2048)
+TEMP = 1.1
+llm = Llama(MODEL_PATH, n_ctw=2048, n_threads=6, n_threads_batch=12)
+
 replace_channel_names = ["general", "nsfw", "adults-only", "vent"]
 bot_name = "jemmy"
+def_convo_len = 20
 
 with open(f"{os.getenv('HOME')}/token.txt", "r") as f:
     token = f.read()
@@ -41,7 +44,7 @@ def create_prompt(messages, max_len=2048):
 
 class Jemmy(discord.Client):
     async def on_ready(self):
-        print("Logged in. Loading model...")
+        print("Logged in.")
 
     async def on_message(self, msg):
         is_dm = isinstance(msg.channel, discord.channel.DMChannel)
@@ -57,3 +60,24 @@ class Jemmy(discord.Client):
             async with msg.channel.typing():
                 print(f"Received message: {msg.author.name}")
                 print(f"Content: {msg.content}\n\n")
+                messages = [msg]
+                if is_reply:
+                    while messages[0].reference is not None:
+                        messages.insert(0, messages[0].reference)
+                else:
+                    messages = []
+                    async for m in msg.channel.history:
+                        messages.append(m)
+                    messages.append(msg)
+                prompt = create_prompt(messages)
+                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["<|endmessage"])
+                pl = len(prompt)
+                outs = out["choices"][0]["text"][pl:]
+                await msg.reply(outs)
+
+intents = discord.Intents.default()
+intents.message_content = True
+
+jemmy = Jemmy(intents=intents)
+
+jemmy.run(token)
