@@ -1,6 +1,6 @@
 from llama_cpp import Llama
 import discord
-import os, random, threading, asyncio, secrets, time
+import os, random, threading, asyncio, secrets, time, copy
 
 MODEL_PATH = "/xb/llms/mistral-7b-v0.1.Q5_K_M.gguf"
 TEMP = 1.4
@@ -21,11 +21,16 @@ with open(f"{os.getenv('HOME')}/token.txt", "r") as f:
 def gen_thread_run():
     global gens, genlock
     while True:
-        with genlock:
-            for g in gens:
-                if gens[g]["out"] is None:
-                    out = llm(prompt=gens[g]["prompt"], max_tokens=256, temperature=TEMP, stop=["\n\n"], repeat_penalty=REP_PENALTY)
-                    gens[g]["out"] = out
+        genlock.acquire()
+        for g in gens.copy():
+            prompt = ""
+            if gens[g]["out"] is None:
+                prompt = gens[g]["prompt"]
+                genlock.release()
+                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["\n\n"], repeat_penalty=REP_PENALTY)
+                genlock.acquire()
+                gens[g]["out"] = out
+        genlock.release()
         time.sleep(2)
 
 async def generate(prompt):
