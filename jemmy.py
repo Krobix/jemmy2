@@ -2,11 +2,11 @@ from llama_cpp import Llama
 import discord
 import os, random
 
-MODEL_PATH = f"{os.getenv('HOME')}/jemmy_v1.gguf"
-TEMP = 1.1
+MODEL_PATH = "/xb/llms/mistral-7b-v0.1.Q5_K_M.gguf"
+TEMP = 1.0
 llm = Llama(MODEL_PATH, n_ctw=2048, n_threads=6, n_threads_batch=12)
 
-replace_channel_names = ["general", "nsfw", "adults-only", "vent"]
+replace_channel_names = []
 bot_name = "jemmy"
 def_convo_len = 20
 
@@ -23,12 +23,12 @@ def getcn(msg):
     else:
          return random.choice(replace_channel_names)
 
-def create_prompt(messages, max_len=1024):
+def create_prompt(messages, max_len=2048):
     tokenl = []
     strs = []
-    cstr = f"<|channel {getcn(messages[0])}|>"
+    cstr = ""
     for m in messages:
-        s = f"<|message {m.author.name}|>{m.content}</s>"
+        s = f"{m.author.name}: {m.content}\n\n"
         strs.append(s)
         tokenl.append(llm.tokenize(s.encode("utf-8")))
     while True:
@@ -40,7 +40,7 @@ def create_prompt(messages, max_len=1024):
             tokenl.pop(0)
         else:
             break
-    return cstr+("".join(strs))+f"<|message {bot_name}|>"
+    return cstr+("".join(strs))+f"{bot_name}: "
 
 class Jemmy(discord.Client):
     async def on_ready(self):
@@ -71,7 +71,7 @@ class Jemmy(discord.Client):
                         messages.append(m)
                     messages.append(msg)
                 prompt = create_prompt(messages)
-                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["</s>"])
+                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["\n\n"])
                 pl = len(prompt)
                 outs = out["choices"][0]["text"]
                 await msg.reply(outs)
