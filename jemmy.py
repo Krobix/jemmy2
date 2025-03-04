@@ -1,6 +1,6 @@
 from llama_cpp import Llama
 import discord
-import os, random
+import os, random, threading, asyncio, secrets, time
 
 MODEL_PATH = "/xb/llms/mistral-7b-v0.1.Q5_K_M.gguf"
 TEMP = 1.4
@@ -11,9 +11,38 @@ replace_channel_names = []
 bot_name = "jemmy"
 def_convo_len = 20
 
+gens = {}
+genlock = threading.Lock()
+
 with open(f"{os.getenv('HOME')}/token.txt", "r") as f:
     token = f.read()
     token = token.strip()
+
+def gen_thread_run():
+    global gens, genlock
+    while True:
+        with genlock:
+            for g in gens:
+                if gens[g]["out"] is None:
+                    out = llm(prompt=gens[g]["prompt"], max_tokens=256, temperature=TEMP, stop=["\n\n"], repeat_penalty=REP_PENALTY)
+                    gens[g]["out"] = out
+        time.sleep(2)
+
+async def generate(prompt):
+    genid = secrets.token_hex(32)
+    with genlock:
+        gens[genid] = {
+            "prompt": prompt,
+            "out": None
+        }
+    while True:
+        await asyncio.sleep(1)
+        if not genlock.locked():
+            with genlock:
+                if gens[genid]["out"] is not None:
+                    out = gens[genid]["out"]
+                    gens.pop(genid)
+                    return out
 
 def getcn(msg):
     if len(replace_channel_names)<1:
@@ -72,8 +101,7 @@ class Jemmy(discord.Client):
                     #    messages.append(m)
                     messages.append(msg)
                 prompt = create_prompt(messages)
-                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["\n\n"], repeat_penalty=1.18)
-                pl = len(prompt)
+                out = await generate(prompt)
                 outs = out["choices"][0]["text"]
                 await msg.reply(outs)
 
@@ -81,5 +109,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 jemmy = Jemmy(intents=intents)
+gen_thread = threading.Thread(target=gen_thread_run, name="genthread")
 
+gen_thread.run()
 jemmy.run(token)
