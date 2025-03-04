@@ -4,6 +4,7 @@ import os, random
 
 MODEL_PATH = "/xb/llms/mistral-7b-v0.1.Q5_K_M.gguf"
 TEMP = 1.4
+REP_PENALTY=1.18
 llm = Llama(MODEL_PATH, n_ctx=2048, n_threads=6, n_threads_batch=12)
 
 replace_channel_names = []
@@ -71,7 +72,7 @@ class Jemmy(discord.Client):
                     #    messages.append(m)
                     messages.append(msg)
                 prompt = create_prompt(messages)
-                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["\n\n"])
+                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["\n\n"], repeat_penalty=1.18)
                 pl = len(prompt)
                 outs = out["choices"][0]["text"]
                 await msg.reply(outs)
