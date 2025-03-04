@@ -28,7 +28,7 @@ def create_prompt(messages, max_len=2048):
     strs = []
     cstr = ""
     for m in messages:
-        s = f"{m.author.name}: {m.content}\n\n"
+        s = f"{m.author.name}: {m.clean_content}\n\n"
         strs.append(s)
         tokenl.append(llm.tokenize(s.encode("utf-8")))
     while True:
@@ -59,7 +59,7 @@ class Jemmy(discord.Client):
         if is_dm or (str(self.user.id) in msg.content) or is_reply_to_me:
             async with msg.channel.typing():
                 print(f"Received message: {msg.author.name}")
-                print(f"Content: {msg.content}\n\n")
+                print(f"Content: {msg.clean_content}\n\n")
                 messages = [msg]
                 if is_reply:
                     while messages[0].reference is not None:
