@@ -3,7 +3,7 @@ import discord
 import os, random
 
 MODEL_PATH = "/xb/llms/mistral-7b-v0.1.Q5_K_M.gguf"
-TEMP = 1.0
+TEMP = 1.4
 llm = Llama(MODEL_PATH, n_ctx=2048, n_threads=6, n_threads_batch=12)
 
 replace_channel_names = []
