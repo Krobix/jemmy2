@@ -67,8 +67,8 @@ class Jemmy(discord.Client):
                         messages.insert(0, nm)
                 else:
                     messages = []
-                    async for m in msg.channel.history(limit=def_convo_len):
-                        messages.append(m)
+                    #async for m in msg.channel.history(limit=def_convo_len):
+                    #    messages.append(m)
                     messages.append(msg)
                 prompt = create_prompt(messages)
                 out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["\n\n"])
