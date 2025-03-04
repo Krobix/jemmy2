@@ -111,5 +111,5 @@ intents.message_content = True
 jemmy = Jemmy(intents=intents)
 gen_thread = threading.Thread(target=gen_thread_run, name="genthread")
 
-gen_thread.run()
+gen_thread.start()
 jemmy.run(token)
