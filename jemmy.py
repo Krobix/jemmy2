@@ -88,7 +88,7 @@ class Jemmy(discord.Client):
         iswh=True
         msglist.append(await self.on_message(msg, alwaysreply=True))
         while len(msglist)<def_convo_len:
-            print(f"genconvo(): msglist: {msglist}")
+            #print(f"genconvo(): msglist: {msglist}")
             if iswh:
                 wh = webhook
             else:
@@ -128,7 +128,7 @@ class Jemmy(discord.Client):
                 if webhook is None:
                     nmsg = await msg.reply(outs)
                 else:
-                    nmsg = await webhook.send(outs, wait=True)
+                    nmsg = await webhook.send(content=outs, wait=True)
                 print(f"Sent message: {nmsg.id}")
                 return nmsg
 
