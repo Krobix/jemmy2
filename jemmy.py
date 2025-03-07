@@ -49,6 +49,7 @@ async def generate(prompt):
                     gens.pop(genid)
                     return out
 
+
 def getcn(msg):
     if len(replace_channel_names)<1:
         if isinstance(msg.channel, discord.channel.DMChannel):
@@ -81,7 +82,22 @@ class Jemmy(discord.Client):
     async def on_ready(self):
         print("Logged in.")
 
-    async def on_message(self, msg):
+    async def genconvo(self, clean_name, msg, channel):
+        webhook = await channel.create_webhook(clean_name)
+        msglist = []
+        iswh=True
+        msglist.append(await self.on_message(msg, alwaysreply=True))
+        while len(msglist)<def_convo_len:
+            if iswh:
+                wh = webhook
+            else:
+                wh = None
+            newmsg = await self.on_message(msglist[-1], webhook=wh, alwaysreply=True)
+            msglist.append(newmsg)
+            iswh = not iswh
+        await webhook.delete()
+
+    async def on_message(self, msg, webhook=None, alwaysreply=False):
         is_dm = isinstance(msg.channel, discord.channel.DMChannel)
         is_reply = (msg.reference is not None)
         if is_reply:
@@ -91,7 +107,7 @@ class Jemmy(discord.Client):
         if msg.author.id == self.user.id:
             return
 
-        if is_dm or (str(self.user.id) in msg.content) or is_reply_to_me:
+        if is_dm or (str(self.user.id) in msg.content) or is_reply_to_me or alwaysreply:
             async with msg.channel.typing():
                 print(f"Received message: {msg.author.name}")
                 print(f"Content: {msg.clean_content}\n\n")
@@ -108,7 +124,10 @@ class Jemmy(discord.Client):
                 prompt = create_prompt(messages)
                 out = await generate(prompt)
                 outs = out["choices"][0]["text"]
-                await msg.reply(outs)
+                if webhook is None:
+                    return await msg.reply(outs, wait=True)
+                else:
+                    return await webhook.send(outs, wait=True)
 
 intents = discord.Intents.default()
 intents.message_content = True
