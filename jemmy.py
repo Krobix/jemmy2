@@ -93,7 +93,7 @@ class Jemmy(discord.Client):
                 wh = webhook
             else:
                 wh = None
-            newmsg = await self.on_message(msglist[-1], webhook=wh, alwaysreply=True)
+            newmsg = await self.on_message(msg=msglist[-1], webhook=wh, alwaysreply=True)
             msglist.append(newmsg)
             iswh = not iswh
         await webhook.delete()
@@ -105,7 +105,7 @@ class Jemmy(discord.Client):
             is_reply_to_me = (await msg.channel.fetch_message(msg.reference.message_id)).author.id == self.user.id
         else:
             is_reply_to_me = False
-        if msg.author.id == self.user.id:
+        if (msg.author.id == self.user.id) and (not alwaysreply):
             return
 
         if is_dm or (str(self.user.id) in msg.content) or is_reply_to_me or alwaysreply:
