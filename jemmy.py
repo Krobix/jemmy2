@@ -3,7 +3,7 @@ import discord
 import os, random, threading, asyncio, secrets, time, copy
 
 MODEL_PATH = "/xb/llms/mistral-7b-v0.1.Q5_K_M.gguf"
-TEMP = 1.4
+TEMP = 1.1
 REP_PENALTY=1.3
 llm = Llama(MODEL_PATH, n_ctx=2048, n_threads=6, n_threads_batch=12)
 
