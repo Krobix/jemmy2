@@ -117,7 +117,7 @@ class Jemmy(discord.Client):
         if is_dm or (str(self.user.id) in msg.content) or is_reply_to_me or alwaysreply:
             async with msg.channel.typing():
                 print(f"Received message: {msg.author.name}")
-                print(f"Content: {mcontent}\n\n")
+                print(f"Content: {msg.clean_content}\n\n")
                 messages = [msg]
                 if is_reply:
                     while messages[0].reference is not None:
