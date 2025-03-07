@@ -129,6 +129,10 @@ class Jemmy(discord.Client):
                 else:
                     return await webhook.send(outs, wait=True)
 
+        if msg.clean_content.startswith("jem.genconvo"):
+            msg.clean_content = msg.clean_content[len("jem.genconvo"):]
+            await self.genconvo(msg.author.name, msg, msg.channel)
+
 intents = discord.Intents.default()
 intents.message_content = True
 
