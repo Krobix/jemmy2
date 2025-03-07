@@ -125,7 +125,7 @@ class Jemmy(discord.Client):
                 out = await generate(prompt)
                 outs = out["choices"][0]["text"]
                 if webhook is None:
-                    return await msg.reply(outs, wait=True)
+                    return await msg.reply(outs)
                 else:
                     return await webhook.send(outs, wait=True)
 
