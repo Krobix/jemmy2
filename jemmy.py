@@ -28,8 +28,9 @@ def gen_thread_run():
             prompt = ""
             if gens[g]["out"] is None:
                 prompt = gens[g]["prompt"]
+                uname = gens[g]["uname"]
                 genlock.release()
-                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["\n\n"], repeat_penalty=REP_PENALTY)
+                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["\n\n", "jemmy:", f"{uname}:"], repeat_penalty=REP_PENALTY)
                 genlock.acquire()
                 gens[g]["out"] = out
         genlock.release()
@@ -40,6 +41,7 @@ async def generate(prompt):
     with genlock:
         gens[genid] = {
             "prompt": prompt,
+            "uname": prompt.split(":")[0],
             "out": None
         }
     while True:
