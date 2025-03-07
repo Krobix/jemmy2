@@ -88,6 +88,7 @@ class Jemmy(discord.Client):
         iswh=True
         msglist.append(await self.on_message(msg, alwaysreply=True))
         while len(msglist)<def_convo_len:
+            print(f"genconvo(): msglist: {msglist}")
             if iswh:
                 wh = webhook
             else:
