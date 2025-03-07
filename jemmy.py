@@ -101,12 +101,12 @@ class Jemmy(discord.Client):
                 wh = webhook
             else:
                 wh = None
-            newmsg = await self.on_message(msg=msglist[-1], webhook=wh, alwaysreply=True)
+            newmsg = await self.on_message(msg=msglist[-1], webhook=wh, alwaysreply=True, replace_msglist=msglist)
             msglist.append(newmsg)
             iswh = not iswh
         await webhook.delete()
 
-    async def on_message(self, msg, webhook=None, alwaysreply=False):
+    async def on_message(self, msg, webhook=None, alwaysreply=False, replace_msglist=None):
         is_dm = isinstance(msg.channel, discord.channel.DMChannel)
         is_reply = (msg.reference is not None)
         if is_reply:
@@ -121,7 +121,9 @@ class Jemmy(discord.Client):
                 print(f"Received message: {msg.author.name}")
                 print(f"Content: {msg.clean_content}\n\n")
                 messages = [msg]
-                if is_reply:
+                if replace_msglist is not None:
+                    messages = replace_msglist
+                elif is_reply:
                     while messages[0].reference is not None:
                         nm = await msg.channel.fetch_message(messages[0].reference.message_id)
                         messages.insert(0, nm)
