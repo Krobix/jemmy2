@@ -30,7 +30,7 @@ def gen_thread_run():
                 prompt = gens[g]["prompt"]
                 uname = gens[g]["uname"]
                 genlock.release()
-                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["\n\n", "jemmy:", f"{uname}:"], repeat_penalty=REP_PENALTY)
+                out = llm(prompt=prompt, max_tokens=256, temperature=TEMP, stop=["\n", "jemmy:", f"{uname}:"], repeat_penalty=REP_PENALTY)
                 genlock.acquire()
                 gens[g]["out"] = out
         genlock.release()
