@@ -125,9 +125,11 @@ class Jemmy(discord.Client):
                 out = await generate(prompt)
                 outs = out["choices"][0]["text"]
                 if webhook is None:
-                    return (await msg.reply(outs))
+                    nmsg = await msg.reply(outs)
                 else:
-                    return (await webhook.send(outs, wait=True))
+                    nmsg = await webhook.send(outs, wait=True)
+                print(f"Sent message: {nmsg.id}")
+                return nmsg
 
         if msg.clean_content.startswith("jem.genconvo"):
             msg.content = msg.clean_content[len("jem.genconvo"):]
