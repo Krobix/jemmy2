@@ -14,6 +14,8 @@ def_convo_len = 15
 gens = {}
 genlock = threading.Lock()
 
+filter_phrases = ["jem.genconvo"]
+
 with open(f"{os.getenv('HOME')}/token.txt", "r") as f:
     token = f.read()
     token = token.strip()
@@ -64,7 +66,11 @@ def create_prompt(messages, max_len=2048):
     strs = []
     cstr = ""
     for m in messages:
-        s = f"{m.author.name}: {m.clean_content}\n\n"
+        mcontent = m.clean_content
+        for f in filter_phrases:
+            while f in mcontent:
+                mcontent = mcontent.replace(f, "")
+        s = f"{m.author.name}: {mcontent}\n\n"
         strs.append(s)
         tokenl.append(llm.tokenize(s.encode("utf-8")))
     while True:
@@ -111,7 +117,7 @@ class Jemmy(discord.Client):
         if is_dm or (str(self.user.id) in msg.content) or is_reply_to_me or alwaysreply:
             async with msg.channel.typing():
                 print(f"Received message: {msg.author.name}")
-                print(f"Content: {msg.clean_content}\n\n")
+                print(f"Content: {mcontent}\n\n")
                 messages = [msg]
                 if is_reply:
                     while messages[0].reference is not None:
@@ -133,7 +139,6 @@ class Jemmy(discord.Client):
                 return nmsg
 
         if msg.clean_content.startswith("jem.genconvo"):
-            msg.content = msg.clean_content[len("jem.genconvo"):]
             await self.genconvo(msg.author.name, msg, msg.channel)
 
 intents = discord.Intents.default()
