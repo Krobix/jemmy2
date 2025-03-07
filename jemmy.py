@@ -9,7 +9,7 @@ llm = Llama(MODEL_PATH, n_ctx=2048, n_threads=6, n_threads_batch=12)
 
 replace_channel_names = []
 bot_name = "jemmy"
-def_convo_len = 20
+def_convo_len = 15
 
 gens = {}
 genlock = threading.Lock()
@@ -125,9 +125,9 @@ class Jemmy(discord.Client):
                 out = await generate(prompt)
                 outs = out["choices"][0]["text"]
                 if webhook is None:
-                    return await msg.reply(outs)
+                    return (await msg.reply(outs))
                 else:
-                    return await webhook.send(outs, wait=True)
+                    return (await webhook.send(outs, wait=True))
 
         if msg.clean_content.startswith("jem.genconvo"):
             msg.content = msg.clean_content[len("jem.genconvo"):]
