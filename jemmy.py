@@ -83,7 +83,7 @@ class Jemmy(discord.Client):
         print("Logged in.")
 
     async def genconvo(self, clean_name, msg, channel):
-        webhook = await channel.create_webhook(clean_name)
+        webhook = await channel.create_webhook(name=clean_name)
         msglist = []
         iswh=True
         msglist.append(await self.on_message(msg, alwaysreply=True))
