@@ -2,7 +2,7 @@ from llama_cpp import Llama
 import discord
 import os, random, threading, asyncio, secrets, time, copy
 
-MODEL_PATH = "/xb/llms/Mistral-22B-v0.2-Q4_K_M.gguf"
+MODEL_PATH = "/xb/llms/Mistral-Small-2503-Q4_K_S.gguf"
 TEMP = 1.1
 REP_PENALTY=1.18
 llm = Llama(MODEL_PATH, n_ctx=2048, n_threads=6, n_threads_batch=12)
