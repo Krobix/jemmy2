@@ -2,7 +2,7 @@ from llama_cpp import Llama
 import discord
 import os, random, threading, asyncio, secrets, time, copy
 
-MODEL_PATH = "/xb/llms/Cydonia-24B-v2g-Q4_K_M.gguf"
+MODEL_PATH = ""
 TEMP = 1.1
 REP_PENALTY=1.18
 llm = Llama(MODEL_PATH, n_ctx=2048, n_threads=6, n_threads_batch=12)
@@ -19,6 +19,9 @@ filter_phrases = ["jem.genconvo"]
 with open(f"{os.getenv('HOME')}/token.txt", "r") as f:
     token = f.read()
     token = token.strip()
+
+with open(f"{os.getenv('HOME')}/model.txt", "r") as f:
+    MODEL_PATH = f.read().strip()
 
 def gen_thread_run():
     global gens, genlock
