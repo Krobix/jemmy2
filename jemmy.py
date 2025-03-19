@@ -5,7 +5,6 @@ import os, random, threading, asyncio, secrets, time, copy
 MODEL_PATH = ""
 TEMP = 1.1
 REP_PENALTY=1.18
-llm = Llama(MODEL_PATH, n_ctx=2048, n_threads=6, n_threads_batch=12)
 
 replace_channel_names = []
 bot_name = "jemmy"
@@ -22,6 +21,8 @@ with open(f"{os.getenv('HOME')}/token.txt", "r") as f:
 
 with open(f"{os.getenv('HOME')}/model.txt", "r") as f:
     MODEL_PATH = f.read().strip()
+
+llm = Llama(MODEL_PATH, n_ctx=2048, n_threads=6, n_threads_batch=12)
 
 def gen_thread_run():
     global gens, genlock
